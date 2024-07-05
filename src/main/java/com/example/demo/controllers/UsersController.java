@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.mindrot.jbcrypt.BCrypt;
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +73,8 @@ public class UsersController {
                 logger.info("Redirecting admin user to /admin");
                 return "redirect:/admin";
             } else {
-                logger.info("Redirecting user to /apppage");
-                return "redirect:/apppage";
+                logger.info("Redirecting user to /accpage");
+                return "redirect:/accpage";
             }
         } else {
             bindingResult.rejectValue("password", "error.user", "Invalid username or password");
@@ -83,6 +85,26 @@ public class UsersController {
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/app";
+        return "redirect:/";
+    }
+    @GetMapping("/accpage")
+    public String userAccountPage(Model model, HttpSession session) {
+        Users currentUser = (Users) session.getAttribute("currentUser");
+        model.addAttribute("user", currentUser);
+        return "accpage";
+    }
+
+    @GetMapping("/admin")
+    public String adminAccountPage(Model model, HttpSession session) {
+        Users currentUser = (Users) session.getAttribute("currentUser");
+        model.addAttribute("user", currentUser);
+        return "admin";
+    }
+
+    @GetMapping("/admin/allusers")
+    public String adminProfile(Model model) {
+        List<Users> allUsers = (List<Users>) usersRepository.findAll();
+        model.addAttribute("users", allUsers);
+        return "allusers";
     }
 }
